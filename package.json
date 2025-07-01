@@ -1,9 +1,12 @@
 {
   "name": "soga-chat",
   "version": "1.0.0",
-  "description": "A live chat app using sockets",
+  "description": "A live chat app using sockets (backend only)",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "pm2": "pm2 start pm2.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sujal Barnwal",
