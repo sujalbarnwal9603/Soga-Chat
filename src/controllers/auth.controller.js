@@ -5,7 +5,10 @@ import ApiResponse from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken';
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 // Register a new user
+
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -20,7 +23,6 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw new ApiError(500, "Something went wrong while generating tokens");
     }
 }
-
 
 const registerUser = asyncHandler(async (req, res) => {
     const { email, password, fullName } = req.body;
@@ -106,7 +108,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         req.user._id,
         {
             $unset: {
-                refreshToken: undefined
+                refreshToken: null
             }
         },
         {
@@ -170,13 +172,64 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
+const changeCurrentPassword = asyncHandler(async(req,res)=>{
+    const {currentPassword, newPassword}=req.body;
+    if (!currentPassword || !newPassword) {
+        throw new ApiError(400, "All fields are required");
+    }
+    const user=await User.findById(req.user._id)
+    if(!user){
+        throw new ApiError(404, "User not found");
+    }
+    const isPasswordCorrect=await user.isPasswordCorrect(currentPassword);
+    if(!isPasswordCorrect){
+        throw new ApiError(400, "Current Password is incorrect");
+    }
+    user.password=newPassword;
+    await user.save({validateBeforeSave: false});
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Password changed successfully"));
+})
 
+const changeName =asyncHandler(async(req,res)=>{
+    const {fullName}=req.body;
+    if (!fullName) {
+        throw new ApiError(400, "Full Name is required");
+    }
+
+    const user= await User.findById(req.user._id);
+    if(!user){
+        throw new ApiError(404, "User not found");
+    }
+    user.fullName=fullName;
+    await user.save({validateBeforeSave: false});
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Name changed successfully"));
+
+})
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
+})
+
+
+
+
+// Exporting the functions
+// These functions can be used in the routes to handle user authentication
 
 
 export default {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
-
+    refreshAccessToken,
+    changeCurrentPassword,
+    changeName,
+    getCurrentUser,
 }
