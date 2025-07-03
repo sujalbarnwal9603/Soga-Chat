@@ -217,6 +217,37 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 })
 
+const updateUserAvatar = asyncHandler(async(req,res)=>{
+
+    const avatarLocalPath=req.files?.avatar[0]?.path;
+
+    if(!avatarLocalPath){
+        throw new ApiError(400,"Avatar is required");
+    }
+
+    const avatar=await uploadOnCloudinary(avatarLocalPath);
+
+    if(!avatar?.url){
+        throw new ApiError(500, "Avatar upload failed");
+    }
+
+
+
+    const user= await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                avatar:avatar.url
+            }
+        },
+        {new:true}
+    ).select("-password");
+    
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user,"Avatar updated Successfully"));
+
+})
 
 
 
@@ -232,4 +263,5 @@ export default {
     changeCurrentPassword,
     changeName,
     getCurrentUser,
+    updateUserAvatar
 }
