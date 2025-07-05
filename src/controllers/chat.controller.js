@@ -32,3 +32,120 @@ const accessChat=asyncHandler(async(req, res)=>{
     return res.status(201).json(new ApiResponse(201,fullChat));
 });
 
+
+const fetchChats = asyncHandler(async(req,res)=>{
+    const chats= await Chat.find({
+        users: req.user._id
+    })
+        .populate("users","-password")
+        .populate("groupAdmin","-password")
+        .populate({
+            path:"latestMessage",
+            populate:{
+                path:"sender",
+                select:"fullName email",
+            },
+        })
+        .sort({updatedAt:-1})
+
+    return res.status(200).json(new ApiResponse(200,chats));
+})
+
+
+const createGroupChat=asyncHandler(async(req,res)=>{
+    const {users, name}= req.body;
+
+    if(!users || !name){
+        throw new ApiError(400,"Please provide users and name")
+    }
+
+    if(users.length<2){
+        throw new ApiError(400,"More than 2 people required");
+    }
+    users.push(req.user._id);
+
+    const groupChat= await Chat.create({
+        chatName: name,
+        users,
+        isGroupChat:true,
+        groupAdmin:req.user?._id,
+    });
+
+    const fullGroupChat= await Chat.findById(groupChat._id)
+        .populate("users","-password")
+        .populate("groupAdmin", "-password");
+    
+    return res
+        .status(200)
+        .json(new ApiResponse(201,fullGroupChat));
+
+})
+
+// Rename Group
+
+const renameGroup= asyncHandler(async(req,res)=>{
+    const {chatId,chatName}= req.body;
+
+    const updatedChat=await Chat.findByIdAndUpdate(
+        chatId,
+        {chatName},
+        {new:true}
+    ).populate("users","-password").populate("groupAdmin","-password");
+
+
+    if(!updatedChat){
+        throw new ApiError(400,"Chat not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,updatedChat));
+
+})
+
+const addToGroup=asyncHandler(async(req,res)=>{
+    const {chatId, userId}= req.body;
+    const added =await Chat.findByIdAndUpdate(
+        chatId,
+        {$push:{users:userId}},
+        {new:true}
+    ).populate("users","-password").populate("groupAdmin","-password");
+
+    if(!added){
+        throw new ApiError(400, "Chat not found");
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200,added));
+
+})
+
+const removeFromGroup=asyncHandler(async(req,res)=>{
+    const {chatId,userId} =req.body;
+
+    const removed=await Chat.findByIdAndUpdate(
+        chatId,
+        {$pull:{users:userId}},
+        {new:true}
+
+    ).populate("users","-password").populate("groupAdmin","-password");
+
+    if(!removed){
+        throw new ApiError(400,"Chat not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, removed));
+
+})
+
+
+export default{
+    accessChat,
+    fetchChats,
+    createGroupChat,
+    renameGroup,
+    addToGroup,
+    removeFromGroup
+}
