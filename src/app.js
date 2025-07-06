@@ -6,7 +6,9 @@ import authRoutes from "./routes/auth.routes.js";
 import chatRoutes from "./routes/chat.routes.js"
 import messageRoutes from "./routes/message.routes.js"
 
-import connectDB from "./db/index.js"
+import http from "http";
+
+
 
 const app = express();
 const server=http.createServer(app); //this is new

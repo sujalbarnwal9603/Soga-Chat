@@ -8,13 +8,15 @@ dotenv.config();
 
 connectDB()
   .then(() => {
-    app.listen(process.env.PORT || 8000, () => {
-      console.log("☸️Server is running on port", process.env.PORT || 8000);
+    // Initialize Socket.IO
+    setupSocket(server); //Start socket.io after server starts
+    server.listen(process.env.PORT || 8000, () => {
+    console.log("☸️Server is running on port", process.env.PORT || 8000);
+      
+
     });
 
-    // Initialize Socket.IO
-    setupSocket(server)
-
+    
 
   })
   .catch((err) => {

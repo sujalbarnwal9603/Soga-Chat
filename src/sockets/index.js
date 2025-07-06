@@ -11,13 +11,34 @@ export const setupSocket = async (httpServer) => {
         }
     });
 
-    const pubClient = createClient({ url: process.env.REDIS_URL });
-    const subClient = pubClient.duplicate();
+    /********************
+    redis-client
+
+    // const pubClient = createClient({ url: process.env.REDIS_URL });
+    // const subClient = pubClient.duplicate();
+
+    // await pubClient.connect();
+    // await subClient.connect();
+
+    // io.adapter(createAdapter(pubClient, subClient));
+
+    ****************/
+
+    //** Redis Upstash connection (TLS enabled)**//
+    const pubClient = createClient({
+        url: process.env.REDIS_URL, //.env
+        socket:{
+            tls:true,
+            rejectUnauthorized:false,
+        }
+    });
+    const subClient=pubClient.duplicate();
 
     await pubClient.connect();
     await subClient.connect();
 
-    io.adapter(createAdapter(pubClient, subClient));
+    io.adapter(createAdapter(pubClient, subClient))
+    //*******************//
 
     io.on("connection", (socket) => {
         console.log("🟢  New Client connected", socket.id);
