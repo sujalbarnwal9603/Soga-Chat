@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"; // ✅ Correct import matching your installed package
+
 
 const userSchema = new Schema({
     fullName: {
