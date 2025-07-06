@@ -1,8 +1,12 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import ApiError from "./utils/ApiError.js";
 
+import authRoutes from "./routes/auth.routes.js";
+import chatRoutes from "./routes/chat.routes.js"
+import messageRoutes from "./routes/message.routes.js"
+
+import connectDB from "./db/index.js"
 
 const app = express();
 
@@ -15,10 +19,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-import authRoutes from "./routes/auth.routes.js";
+
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/chat",chatRoutes);
+app.use("/api/v1/message", messageRoutes)
 
+
+// Health Route or default route
 app.get("/", (req,res)=>{
     res.send("API is Live 🔥")
 })
