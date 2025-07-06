@@ -9,6 +9,7 @@ import messageRoutes from "./routes/message.routes.js"
 import connectDB from "./db/index.js"
 
 const app = express();
+const server=http.createServer(app); //this is new
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
@@ -47,4 +48,4 @@ app.use((err,req,res,next)=>{
 })
 
 
-export {app};
+export {app, server}; // Export both

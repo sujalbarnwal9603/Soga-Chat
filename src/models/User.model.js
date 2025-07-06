@@ -34,7 +34,11 @@ const userSchema = new Schema({
         type: String,
         enum: ["online", "offline", "away"],
         default: "offline"
+    },
+    lastSeen: {
+        type: Date
     }
+
 },
     { timestamps: true }
 )
