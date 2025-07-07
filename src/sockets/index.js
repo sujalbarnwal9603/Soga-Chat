@@ -62,10 +62,11 @@ export const setupSocket = async (httpServer) => {
 
         socket.on("new message", (messageData) => {
             const chat = messageData.chat;
-            if (!chat?.users) return;
+            if (!chat?.users || !messageData?.sender?._id) return; 
 
             chat.users.forEach((user) => {
                 if (user._id === messageData.sender._id) return;
+                
                 socket.in(user._id).emit("message received", messageData);
             });
         });
