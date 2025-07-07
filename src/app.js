@@ -13,6 +13,18 @@ import http from "http";
 const app = express();
 const server=http.createServer(app); //this is new
 
+///****     frontend       ********* */
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "../frontend")));
+///************* */
+
+
+
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
