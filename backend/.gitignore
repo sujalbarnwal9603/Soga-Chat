@@ -1,5 +1,4 @@
-<<<<<<< HEAD
 node_modules
-=======
-node_modules
->>>>>>> 83d095577a8de36edddfa468c21b27a990194f50
+# .gitignore
+.next/
+node_modules/
