@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,12 +27,21 @@ export function ChatSidebar({ chats, selectedChat, onChatSelect, onNewChat }: Ch
   const [groupDialogOpen, setGroupDialogOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [filteredChats, setFilteredChats] = useState<Chat[]>([])
 
-  const filteredChats = chats.filter(
-    (chat) =>
-      chat.chatName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.users.some((u) => u.fullName.toLowerCase().includes(searchQuery.toLowerCase())),
-  )
+  // Filter chats based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredChats(chats)
+    } else {
+      const filtered = chats.filter(
+        (chat) =>
+          chat.chatName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          chat.users.some((u) => u.fullName.toLowerCase().includes(searchQuery.toLowerCase())),
+      )
+      setFilteredChats(filtered)
+    }
+  }, [chats, searchQuery])
 
   const getChatName = (chat: Chat) => {
     if (chat.isGroupChat) {
@@ -60,7 +69,7 @@ export function ChatSidebar({ chats, selectedChat, onChatSelect, onNewChat }: Ch
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold">Chats</h1>
+          <h1 className="text-xl font-semibold">Chats ({chats.length})</h1>
           <div className="flex space-x-2">
             <Button variant="ghost" size="sm" onClick={() => setSearchOpen(true)}>
               <Search className="h-4 w-4" />
@@ -88,7 +97,7 @@ export function ChatSidebar({ chats, selectedChat, onChatSelect, onNewChat }: Ch
           {filteredChats.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No chats found</p>
+              <p>{chats.length === 0 ? "No chats yet" : "No chats found"}</p>
               <Button variant="outline" size="sm" className="mt-2 bg-transparent" onClick={() => setSearchOpen(true)}>
                 Start a conversation
               </Button>

@@ -26,8 +26,8 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 
 
 app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
+    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    credentials: true
 }));
 
 

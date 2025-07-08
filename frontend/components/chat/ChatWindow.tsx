@@ -10,16 +10,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import type { Chat, Message } from "@/types"
-import { Send, Users, MoreVertical } from "lucide-react"
+import { Send, Users, MoreVertical, Wifi, WifiOff } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 interface ChatWindowProps {
   chat: Chat
   messages: Message[]
   onSendMessage: (content: string) => void
+  isConnected: boolean
 }
 
-export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, isConnected }: ChatWindowProps) {
   const { user } = useAuth()
   const [newMessage, setNewMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -34,7 +35,7 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (newMessage.trim()) {
+    if (newMessage.trim() && isConnected) {
       onSendMessage(newMessage.trim())
       setNewMessage("")
     }
@@ -71,13 +72,23 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
 
             <div>
               <h2 className="font-semibold">{getChatName()}</h2>
-              {chat.isGroupChat && (
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                {chat.isGroupChat && (
                   <Badge variant="secondary" className="text-xs">
                     {chat.users.length} members
                   </Badge>
+                )}
+                <div className="flex items-center space-x-1">
+                  {isConnected ? (
+                    <Wifi className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <WifiOff className="h-3 w-3 text-red-500" />
+                  )}
+                  <span className={`text-xs ${isConnected ? "text-green-600" : "text-red-600"}`}>
+                    {isConnected ? "Online" : "Offline"}
+                  </span>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -126,13 +137,17 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={isConnected ? "Type a message..." : "Connecting..."}
             className="flex-1"
+            disabled={!isConnected}
           />
-          <Button type="submit" disabled={!newMessage.trim()}>
+          <Button type="submit" disabled={!newMessage.trim() || !isConnected}>
             <Send className="h-4 w-4" />
           </Button>
         </form>
+        {!isConnected && (
+          <p className="text-xs text-red-500 mt-1">Connection lost. Messages will be sent when reconnected.</p>
+        )}
       </div>
     </div>
   )

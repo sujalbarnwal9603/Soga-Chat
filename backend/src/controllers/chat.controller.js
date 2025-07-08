@@ -33,22 +33,40 @@ const accessChat=asyncHandler(async(req, res)=>{
 });
 
 
-const fetchChats = asyncHandler(async(req,res)=>{
-    const chats= await Chat.find({
+// const fetchChats = asyncHandler(async(req,res)=>{
+//     const chats= await Chat.find({
+//         users: req.user._id
+//     })
+//         .populate("users","-password")
+//         .populate("groupAdmin","-password")
+//         .populate({
+//             path:"latestMessage",
+//             populate:{
+//                 path:"sender",
+//                 select:"fullName email",
+//             },
+//         })
+//         .sort({updatedAt:-1})
+
+//     return res.status(200).json(new ApiResponse(200,chats));
+// })
+// In your chat.controller.js, update the fetchChats function:
+const fetchChats = asyncHandler(async(req, res) => {
+    const chats = await Chat.find({
         users: req.user._id
     })
-        .populate("users","-password")
-        .populate("groupAdmin","-password")
+        .populate("users", "fullName email avatar _id")  // ✅ Include _id
+        .populate("groupAdmin", "fullName email avatar _id")  // ✅ Include _id
         .populate({
-            path:"latestMessage",
-            populate:{
-                path:"sender",
-                select:"fullName email",
+            path: "latestMessage",
+            populate: {
+                path: "sender",
+                select: "fullName email avatar _id",  // ✅ Include _id
             },
         })
-        .sort({updatedAt:-1})
+        .sort({updatedAt: -1})
 
-    return res.status(200).json(new ApiResponse(200,chats));
+    return res.status(200).json(new ApiResponse(200, chats));
 })
 
 
