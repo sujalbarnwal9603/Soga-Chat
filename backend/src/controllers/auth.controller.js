@@ -249,7 +249,6 @@ const updateUserAvatar = asyncHandler(async(req,res)=>{
 
 })
 
-<<<<<<< HEAD
 const searchUsers = asyncHandler(async (req, res) => {
     const keyword = req.query.search
         ? {
@@ -267,8 +266,6 @@ const searchUsers = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, users, "Users fetched successfully"));
 });
 
-=======
->>>>>>> 83d095577a8de36edddfa468c21b27a990194f50
 
 
 // Exporting the functions
@@ -283,10 +280,6 @@ export default {
     changeCurrentPassword,
     changeName,
     getCurrentUser,
-<<<<<<< HEAD
     updateUserAvatar,
     searchUsers
-=======
-    updateUserAvatar
->>>>>>> 83d095577a8de36edddfa468c21b27a990194f50
 }
