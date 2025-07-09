@@ -22,7 +22,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     if (user) {
       console.log("🔌 Connecting to socket server for user:", user._id)
 
-      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8000", {
+      const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000", {
+        
         withCredentials: true,
         transports: ["websocket", "polling"],
         upgrade: true,
